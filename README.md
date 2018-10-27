@@ -20,3 +20,9 @@ Documentation:
 
 https://arduino-esp8266.readthedocs.io/en/latest/
 https://arduino-esp8266.readthedocs.io/en/latest/reference.html#digital-io
+
+# breadboard layout
+The resistor in the image is 1k but the value is not that important, you can use values between about 500 Ohms to a few k Ohms
+
+The built in LED will light up for 200 ms when the reed contact is closed. If you have a contact which is normally closed (opens when a magnetic field is present), logic in the code has to be inverted.
+![breadboard](reed_contact_breadboard.png)

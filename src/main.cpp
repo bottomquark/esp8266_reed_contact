@@ -18,13 +18,13 @@ void setup()
 //endless loop, gets executed automatically as fast as possible
 void loop()
 {
-
-  //set the pin high
+  uint8_t reedValue = digitalRead(REED_PIN);
+  //for normally open contacts. Invert for normally closed ones (reedValue == 1)
+  if(reedValue == 0)
+  {
+    //set the pin low (turn on the LED, functionality is inverted here)
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(200);
+  }
   digitalWrite(LED_BUILTIN, HIGH);
-  //let the microcontroller sleep 100 ms
-  delay(100);
-  //set the pin low
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-
 }
