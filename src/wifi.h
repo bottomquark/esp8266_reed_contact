@@ -1,3 +1,7 @@
+/*
+ * MIT License <http://opensource.org/licenses/MIT>.
+ */
+
 #ifndef _WIFI_H_
 #define _WIFI_H_
 

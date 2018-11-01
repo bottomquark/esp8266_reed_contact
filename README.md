@@ -39,3 +39,12 @@ Find the default configuration in the file `config-default.h`. To do custom conf
 * insert custom configuration
 * compile
 Note: The created `config.h` file registered to be ignored by git commit.
+
+## Logging
+
+The logging is activated by default. To disable the logging, add 
+```
+build_flags =
+  -D DISABLE_LOGGING=1
+```
+to `platformio.ini` file.
