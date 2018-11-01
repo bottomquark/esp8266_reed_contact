@@ -1,3 +1,7 @@
+/*
+ * MIT License <http://opensource.org/licenses/MIT>.
+ */
+
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 

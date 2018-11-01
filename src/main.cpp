@@ -1,8 +1,9 @@
 /*
- * 
- *
+ * MIT License <http://opensource.org/licenses/MIT>.
  */
+
 #include <Arduino.h>
+#include <ArduinoLog.h>
 #include <wifi.h>
 
 #define REED_PIN D1
@@ -10,8 +11,8 @@
 //setup() gets called once when the microcontroller gets powered on or reset
 void setup()
 {
-  Serial.begin(115200); // Start the Serial communication to send messages to the computer
-  Serial.println('\n');
+  // Initialize logger.
+  Log.init(LOG_LEVEL_VERBOSE, 115200);
 
   //configure REED_PIN as input and the built in LED as output
   //LED_BUILTIN is also pin D4
