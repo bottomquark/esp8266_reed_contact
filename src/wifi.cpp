@@ -25,13 +25,14 @@ void connectToWifiNetwork()
     // wait for connection
     while (WiFi.status() != WL_CONNECTED)
     {
-        digitalWrite(LED_BUILTIN, HIGH);
+        digitalWrite(LED_BUILTIN, LOW);
 
-        delay(200);
+        delay(100);
         Serial.print(".");
         Serial.print(WiFi.status());
 
-        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(100);
     }
 
     Serial.println();
