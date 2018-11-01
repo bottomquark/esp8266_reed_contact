@@ -1,3 +1,6 @@
+# Playground to learn ESP8266 and Reed Contact
+
+[![License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](http://doge.mit-license.org)
 
 # What you need
 
