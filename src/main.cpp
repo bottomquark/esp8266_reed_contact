@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
-#include <wifi.h>
+#include "WiFiSupport.h"
 
 #define REED_PIN D1
 
@@ -20,14 +20,14 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
 
   // Set-Up WiFi connection.
-  wifiSetup();
+  WiFiSupport.wifiSetup();
 }
 
 //endless loop, gets executed automatically as fast as possible
 void loop()
 {
   // Check WiFi connection.
-  wifiLoop();
+  WiFiSupport.wifiLoop();
 
   uint8_t reedValue = digitalRead(REED_PIN);
   //for normally open contacts. Invert for normally closed ones (reedValue == 1)

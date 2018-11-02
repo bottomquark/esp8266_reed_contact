@@ -3,25 +3,25 @@
  */
 
 #include <ArduinoLog.h>
-#include <wifi.h>
-#include <config.h>
+#include "WiFiSupport.h"
+#include "Config.h"
 
-void wifiSetup()
+void WiFiSupportClass::wifiSetup()
 {
     Log.debug("Connect to WIFI network ..." CR);
-    connectToWifiNetwork();
+    this->connectToWifiNetwork();
 }
 
-void wifiLoop()
+void WiFiSupportClass::wifiLoop()
 {
     if (WiFi.status() == WL_DISCONNECTED)
     {
         Log.debug("Reconnect to WIFI network ..." CR);
-        connectToWifiNetwork();
+        this->connectToWifiNetwork();
     }
 }
 
-void connectToWifiNetwork()
+void WiFiSupportClass::connectToWifiNetwork()
 {
     WiFi.begin(WIFI_SSID, WIFI_PASS);
 
@@ -37,3 +37,5 @@ void connectToWifiNetwork()
 
     Log.debug("Connected to %s. Got IP address %s" CR, WIFI_SSID, WiFi.localIP().toString().c_str());
 }
+
+WiFiSupportClass WiFiSupport = WiFiSupportClass();
