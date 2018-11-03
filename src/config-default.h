@@ -5,7 +5,10 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-const char *WIFI_SSID = "the_ssid";
-const char *WIFI_PASS = "the_password";
+#define WIFI_SSID "the_ssid"
+#define WIFI_PASS "the_password"
+
+#define MQTT_HOST "hostname/ip"
+#define MQTT_PORT 1883
 
 #endif
