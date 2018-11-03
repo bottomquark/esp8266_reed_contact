@@ -34,11 +34,17 @@ The built in LED will light up for 200 ms when the reed contact is closed. If yo
 
 # Program configuration
 
-Find the default configuration in the file `config-default.h`. To do custom configuration:
-* copy the default config file into `config.h`
+Find the default configuration in the file `Config-default.h`. To do custom configuration:
+* copy the default config file into `Config.h`
 * insert custom configuration
 * compile
-Note: The created `config.h` file registered to be ignored by git commit.
+Note: The created `Config.h` file registered to be ignored by git commit.
+
+Configuration contains:
+* WIFI_SSID - SSID of custom WIFI network
+* WIFI_PASS - Password of WIFI network
+* MQTT_HOST - Host/Ip of MQTT broker installation
+* MQTT_PORT - Port of MQTT broker installation
 
 ## Logging
 
@@ -48,3 +54,7 @@ build_flags =
   -D DISABLE_LOGGING=1
 ```
 to `platformio.ini` file.
+
+
+
+

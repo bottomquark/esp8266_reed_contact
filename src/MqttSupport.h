@@ -2,12 +2,12 @@
  * MIT License <http://opensource.org/licenses/MIT>.
  */
 
-#ifndef _WIFI_SUPPORT_H_
-#define _WIFI_SUPPORT_H_
+#ifndef _MQTT_SUPPORT_H_
+#define _MQTT_SUPPORT_H_
 
-#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
 
-class WiFiSupportClass
+class MqttSupportClass
 {
 private:
   void connect();
@@ -17,6 +17,6 @@ public:
   void loop();
 };
 
-extern WiFiSupportClass WiFiSupport;
+extern MqttSupportClass MqttSupport;
 
 #endif
