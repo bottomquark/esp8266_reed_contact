@@ -11,13 +11,13 @@
 void printTimestamp(Print *_logOutput)
 {
   char c[12];
-  int m = sprintf(c, "%10lu ", millis());
+  sprintf(c, "%10lu ", millis());
   _logOutput->print(c);
 }
 
 void printNewline(Print *_logOutput)
 {
-  _logOutput->print('\n');
+  _logOutput->print(CR);
 }
 
 //setup() gets called once when the microcontroller gets powered on or reset
