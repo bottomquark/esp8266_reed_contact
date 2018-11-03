@@ -8,7 +8,7 @@
 
 void WiFiSupportClass::setup()
 {
-    Log.debug("Connect to WIFI network ..." CR);
+    Log.debug("Connect to WIFI network ...");
     this->connect();
 }
 
@@ -16,7 +16,7 @@ void WiFiSupportClass::loop()
 {
     if (WiFi.status() == WL_DISCONNECTED)
     {
-        Log.debug("Reconnect to WIFI network ..." CR);
+        Log.debug("Reconnect to WIFI network ...");
         this->connect();
     }
 }
@@ -30,10 +30,10 @@ void WiFiSupportClass::connect()
     // wait for connection
     while (WiFi.status() != WL_CONNECTED)
     {
-        Log.trace("WiFi state: %d" CR, WiFi.status());
+        Log.trace("  WIFI state: %d", WiFi.status());
         delay(200);
     }
-    Log.debug("... connected to %s. Got IP address %s" CR, WIFI_SSID, WiFi.localIP().toString().c_str());
+    Log.debug("  connected to %s. Got IP address %s", WIFI_SSID, WiFi.localIP().toString().c_str());
 
     digitalWrite(LED_BUILTIN, HIGH); // turn off the LED
 }

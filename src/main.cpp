@@ -8,11 +8,25 @@
 
 #define REED_PIN D1
 
+void printTimestamp(Print *_logOutput)
+{
+  char c[12];
+  int m = sprintf(c, "%10lu ", millis());
+  _logOutput->print(c);
+}
+
+void printNewline(Print *_logOutput)
+{
+  _logOutput->print('\n');
+}
+
 //setup() gets called once when the microcontroller gets powered on or reset
 void setup()
 {
   // Initialize logger.
   Log.init(LOG_LEVEL_VERBOSE, 115200);
+  Log.setPrefix(printTimestamp);
+  Log.setSuffix(printNewline);
 
   // Initialize MQTT connection.
   MqttSupport.setup();
