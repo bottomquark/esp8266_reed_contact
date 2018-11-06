@@ -6,10 +6,17 @@
 #define _MQTT_SUPPORT_H_
 
 #include <PubSubClient.h>
+#include <elapsedMillis.h>
+
+#ifndef MQTT_KEEPALIVE
+#define MQTT_KEEPALIVE 900
+#endif
 
 class MqttSupportClass
 {
 private:
+  elapsedMillis sinceReconnect;
+  uint32_t reconnectionAttempts;
   void connect();
 
 public:

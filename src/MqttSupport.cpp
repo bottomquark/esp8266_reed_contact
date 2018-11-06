@@ -7,6 +7,8 @@
 #include "MqttSupport.h"
 #include "Config.h"
 
+static String clientId = "ESP8266Client";
+
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
@@ -14,8 +16,6 @@ void MqttSupportClass::setup()
 {
     // Set-Up WiFi connection.
     WiFiSupport.setup();
-
-    Log.debug("Connect to MQTT broker ...");
 
     // Initialize MQTT connection.
     client.setServer(MQTT_HOST, MQTT_PORT);
@@ -27,29 +27,18 @@ void MqttSupportClass::loop()
     // Check WIFI connection.
     WiFiSupport.loop();
 
-    if (!client.connected())
-    {
-        Log.debug("Reconnect to MQTT broker ...");
-        this->connect();
-    }
+    this->connect();
 }
 
 void MqttSupportClass::connect()
 {
-    digitalWrite(LED_BUILTIN, LOW); // turn on the LED
-
-    // wait for connection
-    String clientId;
-    while (!client.connected())
+    if (WiFi.isConnected() && !client.connected() && sinceReconnect >= 10000)
     {
-        clientId = "ESP8266Client-" + String(random(0xffff), HEX);
-        client.connect(clientId.c_str());
-        Log.trace("  MQTT state: %d", client.state());
-        delay(200);
+        Log.trace("Connect to MQTT broker %s:%d. Current client state: %d. Connection attempts: %d",
+                  MQTT_HOST, MQTT_PORT, client.state(), ++reconnectionAttempts);
+        client.connect(clientId.c_str()); // Try to connect to the MQTT broker
+        sinceReconnect = 0;
     }
-    Log.debug("  connected to MQTT on %s:%d with client Id %s", MQTT_HOST, MQTT_PORT, clientId.c_str());
-
-    digitalWrite(LED_BUILTIN, HIGH); // turn off the LED
 }
 
 MqttSupportClass MqttSupport = MqttSupportClass();
