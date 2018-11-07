@@ -4,10 +4,17 @@
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
+#include <ArduinoJson.h>
+#include <elapsedMillis.h>
 #include "MqttSupport.h"
 
 #define REED_PIN D1
 
+elapsedMillis sinceLastTransmission;
+
+/**
+ * Helper method to print timestamp to Log output.
+ */
 void printTimestamp(Print *_logOutput)
 {
   char c[12];
@@ -15,41 +22,72 @@ void printTimestamp(Print *_logOutput)
   _logOutput->print(c);
 }
 
+/**
+ * Helper method to print carriage return to Log output.
+ */
 void printNewline(Print *_logOutput)
 {
   _logOutput->print(CR);
 }
 
-//setup() gets called once when the microcontroller gets powered on or reset
+/**
+ * Read the Reed Contact pin.
+ * @return true, if reed contact closed, otherwise false.
+ */
+bool isReedClosed()
+{
+  // for normally open contacts. Invert for normally closed ones (reedValue == 1)
+  return digitalRead(REED_PIN) == 0;
+}
+
+/**
+ * 'setup()' gets called once when the microcontroller gets powered on or reset.
+ */
 void setup()
 {
   // Initialize logger.
   Log.init(LOG_LEVEL_VERBOSE, 115200);
   Log.setPrefix(printTimestamp);
   Log.setSuffix(printNewline);
+  Log.trace("--- start set-up ---");
 
   // Initialize MQTT connection.
   MqttSupport.setup();
 
-  //configure REED_PIN as input and the built in LED as output
-  //LED_BUILTIN is also pin D4
-  pinMode(REED_PIN, INPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
+  // Configure REED_PIN as input and the built in LED as output
+  pinMode(REED_PIN, INPUT);     // REED_PIN is pin D1
+  pinMode(LED_BUILTIN, OUTPUT); // LED_BUILTIN is also pin D4
 }
 
-//endless loop, gets executed automatically as fast as possible
+/**
+ * Endless loop, gets executed automatically as fast as possible.
+ */
 void loop()
 {
   // Check MQTT connection.
   MqttSupport.loop();
 
-  uint8_t reedValue = digitalRead(REED_PIN);
-  //for normally open contacts. Invert for normally closed ones (reedValue == 1)
-  if (reedValue == 0)
+  if (isReedClosed())
   {
     //set the pin low (turn on the LED, functionality is inverted here)
     digitalWrite(LED_BUILTIN, LOW);
     delay(200);
+
+    // Allocate JsonBuffer. Use http://arduinojson.org/assistant to compute the capacity.
+    StaticJsonBuffer<100> jsonBuffer;
+
+    // Create the root object
+    JsonObject &root = jsonBuffer.createObject();
+    root.set("measure", 1);
+    root.set("duration", millis());
+
+    //
+    String output;
+    root.printTo(output);
+    bool r = MqttSupport.publish(output.c_str());
+
+    Log.debug("Message sent %s, Sent result: %T, Connection state: %T", output.c_str(), r, MqttSupport.isConnected());
   }
+
   digitalWrite(LED_BUILTIN, HIGH);
 }

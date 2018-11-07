@@ -22,6 +22,8 @@ private:
 public:
   void setup();
   void loop();
+  bool isConnected();
+  bool publish(String message);
 };
 
 extern MqttSupportClass MqttSupport;

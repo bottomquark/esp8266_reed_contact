@@ -18,6 +18,7 @@ private:
 public:
   void setup();
   void loop();
+  bool isConnected();
 };
 
 extern WiFiSupportClass WiFiSupport;
