@@ -3,41 +3,93 @@
  */
 
 #include <Arduino.h>
-#include <ArduinoLog.h>
 #include <ArduinoJson.h>
+#include <QueueList.h>
 #include <elapsedMillis.h>
+#include "Global.h"
 #include "MqttSupport.h"
 
 #define REED_PIN D1
 
+#define REED_PIN_STATE_OPEN 1
+#define REED_PIN_STATE_CLOSED 0
+
+// Define elapsed time since last data transmission.
 elapsedMillis sinceLastTransmission;
 
+// Define a queue for reed contact measurements.
+QueueList<String> reedMeasurements;
+
+// Contaons last state of reed pin.( Default is open = 1)
+int reedPinLastState = REED_PIN_STATE_OPEN;
+
 /**
- * Helper method to print timestamp to Log output.
+ * Reads the reed contact pin and identifies whether the reed state switches to close.
+ * @return true, if reed contact switches to close state, otherwise false.
  */
-void printTimestamp(Print *_logOutput)
+bool isReedSwitchedToClose()
 {
-  char c[12];
-  sprintf(c, "%10lu ", millis());
-  _logOutput->print(c);
+  int reedPinState = digitalRead(REED_PIN);
+  bool result = (reedPinState != reedPinLastState) && (reedPinState == REED_PIN_STATE_CLOSED);
+  reedPinLastState = reedPinState;
+  return result;
 }
 
 /**
- * Helper method to print carriage return to Log output.
+ * Created a JsonObject containing mreed contact measurement and current millis.
+ * @param reed measurement
+ * @return JsonObject converted to String.
  */
-void printNewline(Print *_logOutput)
+String createReedMeasurement(int value)
 {
-  _logOutput->print(CR);
+  // Allocate JsonBuffer. Use http://arduinojson.org/assistant to compute the capacity.
+  StaticJsonBuffer<100> jsonBuffer;
+
+  // Create the root object
+  JsonObject &reedMeasurement = jsonBuffer.createObject();
+  reedMeasurement.set("measure", value);
+  reedMeasurement.set("duration", millis());
+
+  // Write generated JsonObject to String.
+  String result;
+  reedMeasurement.printTo(result);
+
+  return result;
 }
 
 /**
- * Read the Reed Contact pin.
- * @return true, if reed contact closed, otherwise false.
+ * Checks the reed pinn and if closed, write the measurement into the local queue.
  */
-bool isReedClosed()
+void collectReedMessages()
 {
-  // for normally open contacts. Invert for normally closed ones (reedValue == 1)
-  return digitalRead(REED_PIN) == 0;
+  if (isReedSwitchedToClose())
+  {
+    // Set the pin low (turn on the LED, functionality is inverted here)
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(50);
+
+    // Buffer the messages in the queue.
+    String reedMeasurement = createReedMeasurement(1);
+    reedMeasurements.push(reedMeasurement);
+  }
+  digitalWrite(LED_BUILTIN, HIGH); // Turn LED off.
+}
+
+/**
+ * Sends the reed messages containing in the local queue to MQTT broker.
+ */
+void sendReedMessages()
+{
+  if (!reedMeasurements.isEmpty() && MqttSupport.isConnected())
+  {
+    String reedMeasurement = reedMeasurements.peek();                     // Get the message from the loca queue.
+    bool sentSuccessfully = MqttSupport.publish(reedMeasurement.c_str()); // try to send the message
+    if (sentSuccessfully)
+    { // if sent successfully => remove from local queue.
+      reedMeasurements.pop();
+    }
+    Log.debug("Message %s was sent %s.", reedMeasurement.c_str(), (sentSuccessfully ? "successfully" : "not successfully"));
+  }
 }
 
 /**
@@ -46,10 +98,7 @@ bool isReedClosed()
 void setup()
 {
   // Initialize logger.
-  Log.init(LOG_LEVEL_VERBOSE, 115200);
-  Log.setPrefix(printTimestamp);
-  Log.setSuffix(printNewline);
-  Log.trace("--- start set-up ---");
+  setupLogger();
 
   // Initialize MQTT connection.
   MqttSupport.setup();
@@ -64,30 +113,7 @@ void setup()
  */
 void loop()
 {
-  // Check MQTT connection.
-  MqttSupport.loop();
-
-  if (isReedClosed())
-  {
-    //set the pin low (turn on the LED, functionality is inverted here)
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
-
-    // Allocate JsonBuffer. Use http://arduinojson.org/assistant to compute the capacity.
-    StaticJsonBuffer<100> jsonBuffer;
-
-    // Create the root object
-    JsonObject &root = jsonBuffer.createObject();
-    root.set("measure", 1);
-    root.set("duration", millis());
-
-    //
-    String output;
-    root.printTo(output);
-    bool r = MqttSupport.publish(output.c_str());
-
-    Log.debug("Message sent %s, Sent result: %T, Connection state: %T", output.c_str(), r, MqttSupport.isConnected());
-  }
-
-  digitalWrite(LED_BUILTIN, HIGH);
+  MqttSupport.loop();    // Check MQTT connection.
+  collectReedMessages(); // Collect reed messages in the local queue.
+  sendReedMessages();    // Send messages from local queue to MQTT.
 }
