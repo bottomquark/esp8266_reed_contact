@@ -4,7 +4,6 @@
 
 #include <ArduinoLog.h>
 #include "WiFiSupport.h"
-#include "Config.h"
 
 void WiFiSupportClass::setup()
 {
@@ -21,8 +20,11 @@ void WiFiSupportClass::connect()
 {
     if (!this->isConnected() && sinceReconnect >= 10000)
     {
-        Log.trace("Connect to WIFI network: %s. Current client state: %d. Connection attempts: %d",
+        Log.trace("Connect to WIFI network %s. Current client state: %d. Connection attempts: %d",
                   WIFI_SSID, WiFi.status(), ++reconnectionAttempts);
+#ifdef WIFI_HOSTNAME
+        WiFi.hostname(WIFI_HOSTNAME);
+#endif
         WiFi.begin(WIFI_SSID, WIFI_PASS);
         sinceReconnect = 0;
     }

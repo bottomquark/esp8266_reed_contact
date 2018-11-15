@@ -8,8 +8,20 @@
 #include <PubSubClient.h>
 #include <elapsedMillis.h>
 
-#ifndef MQTT_KEEPALIVE
-#define MQTT_KEEPALIVE 900
+#ifndef MQTT_CLIENT_ID
+#define MQTT_CLIENT_ID "esp8266"
+#endif
+
+#ifndef MQTT_HOST
+#define MQTT_HOST "127.0.0.1"
+#endif
+
+#ifndef MQTT_PORT
+#define MQTT_PORT 1883
+#endif
+
+#ifndef MQTT_TOPIC_PUB
+#define MQTT_TOPIC_PUB "data/esp8266"
 #endif
 
 class MqttSupportClass

@@ -2,10 +2,14 @@
  * MIT License <http://opensource.org/licenses/MIT>.
  */
 
-#ifndef _GLOBAL_H_
-#define _GLOBAL_H_
+#ifndef _INIT_H_
+#define _INIT_H_
 
 #include <ArduinoLog.h>
+
+#ifndef LOG_LEVEL
+#define LOG_LEVEL LOG_LEVEL_VERBOSE
+#endif
 
 /**
  * Helper method to print timestamp to Log output.
@@ -28,7 +32,7 @@ void printNewline(Print *_logOutput)
 void setupLogger()
 {
     // Initialize logger.
-    Log.init(LOG_LEVEL_VERBOSE, 115200);
+    Log.init(LOG_LEVEL, 115200);
     Log.setPrefix(printTimestamp);
     Log.setSuffix(printNewline);
     Log.trace("--- start set-up ---");

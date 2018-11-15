@@ -33,28 +33,20 @@ The built in LED will light up for 200 ms when the reed contact is closed. If yo
 ![breadboard](reed_contact_breadboard.png)
 
 # Program configuration
+The program is configured using the `build_flag`s. The table below lists all required and optional configuration possibilities:
 
-Find the default configuration in the file `Config-default.h`. To do custom configuration:
-* copy the default config file into `Config.h`
-* insert custom configuration
-* compile
-Note: The created `Config.h` file registered to be ignored by git commit.
+| Build flag | Necessity | Default value | Description |
+| - | - | - | - |
+| LOG_LEVEL | no | LOG_LEVEL_VERBOSE | Sets the Log Level. Look [hier](https://github.com/georg-koch/Arduino-Log) for available Log Levels.| 
+| DISABLE_LOGGING | no| | Set this flag (without any values) to disable the logging completely. |
+| MQTT_HOST | yes | 127.0.0.1 | Set the IP address of [MQTT](http://mqtt.org) broker. |  
+| MQTT_PORT | no  | 1883      | Set the Port to access MQTT broker. Port 1883 is the default port of [mosquitto](https://mosquitto.org) MQTT broker.|
+| MQTT_CLIENT_ID | no | esp8266 | Client ID which is visible in MQTT broker as connected client. |
+| MQTT_TOPIC_PUB | no | data/esp8266 | MQTT topic to which the measurements will be written. |
+| WIFI_SSID | yes | | SSID of your WiFi network. |
+| WIFI_PASS | yes | | Password of your WiFi network. |
+| WIFI_HOSTNAME | no | | Hostname with which the client appears on your network. If not set, the WiFi client will set a default depends on your platform. |
 
-Configuration contains:
-* WIFI_SSID - SSID of custom WIFI network
-* WIFI_PASS - Password of WIFI network
-* MQTT_HOST - Host/Ip of MQTT broker installation
-* MQTT_PORT - Port of MQTT broker installation
-
-## Logging
-
-The logging is activated by default. To disable the logging, add 
-```
-build_flags =
-  -D DISABLE_LOGGING=1
-```
-to `platformio.ini` file.
-
-
+In the example you see in the commited platformio.ini file, I use the system environment variable for network configuration. 
 
 

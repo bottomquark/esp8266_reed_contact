@@ -6,7 +6,7 @@
 #include <ArduinoJson.h>
 #include <QueueList.h>
 #include <elapsedMillis.h>
-#include "Global.h"
+#include "Init.h"
 #include "MqttSupport.h"
 
 #define REED_PIN D1
@@ -64,15 +64,10 @@ void collectReedMessages()
 {
   if (isReedSwitchedToClose())
   {
-    // Set the pin low (turn on the LED, functionality is inverted here)
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(50);
-
     // Buffer the messages in the queue.
     String reedMeasurement = createReedMeasurement(1);
     reedMeasurements.push(reedMeasurement);
   }
-  digitalWrite(LED_BUILTIN, HIGH); // Turn LED off.
 }
 
 /**
@@ -82,13 +77,24 @@ void sendReedMessages()
 {
   if (!reedMeasurements.isEmpty() && MqttSupport.isConnected())
   {
-    String reedMeasurement = reedMeasurements.peek();                     // Get the message from the loca queue.
+    String reedMeasurement = reedMeasurements.peek();                     // Get the message from the local queue.
     bool sentSuccessfully = MqttSupport.publish(reedMeasurement.c_str()); // try to send the message
     if (sentSuccessfully)
-    { // if sent successfully => remove from local queue.
+    {
+      // Set the pin low (turn on the LED, functionality is inverted here)
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(50);
+
+      // remove from local queue.
       reedMeasurements.pop();
+      Log.debug("Message %s was successfully sent to topic %s.", reedMeasurement.c_str(), MQTT_TOPIC_PUB);
+
+      digitalWrite(LED_BUILTIN, HIGH); // Turn LED off.
     }
-    Log.debug("Message %s was sent %s.", reedMeasurement.c_str(), (sentSuccessfully ? "successfully" : "not successfully"));
+    else
+    {
+      Log.error("Failed to sent message %s to topic %s.", reedMeasurement.c_str(), MQTT_TOPIC_PUB);
+    }
   }
 }
 
@@ -106,6 +112,8 @@ void setup()
   // Configure REED_PIN as input and the built in LED as output
   pinMode(REED_PIN, INPUT);     // REED_PIN is pin D1
   pinMode(LED_BUILTIN, OUTPUT); // LED_BUILTIN is also pin D4
+
+  digitalWrite(LED_BUILTIN, HIGH); // Turn LED off.
 }
 
 /**
