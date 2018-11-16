@@ -9,6 +9,8 @@
 WiFiClient wifiClient;
 PubSubClient mqttCient;
 
+void visualizeNetworkConnectionLost();
+
 void MqttSupportClass::setup()
 {
     // Set-Up WiFi connection.
@@ -27,6 +29,7 @@ void MqttSupportClass::loop()
     WiFiSupport.loop();
 
     this->connect();
+    visualizeNetworkConnectionLost();
 }
 
 void MqttSupportClass::connect()
@@ -35,7 +38,12 @@ void MqttSupportClass::connect()
     {
         Log.trace("Connect to MQTT broker %s:%d with clientId %s. Current client state: %d. Connection attempts: %d",
                   MQTT_HOST, MQTT_PORT, MQTT_CLIENT_ID, mqttCient.state(), ++reconnectionAttempts);
-        mqttCient.connect(MQTT_CLIENT_ID); // Try to connect to the MQTT broker
+        // Try to connect to the MQTT broker
+#if defined(MQTT_USER) && defined(MQTT_PASS)
+        mqttCient.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASS);
+#else
+        mqttCient.connect(MQTT_CLIENT_ID);
+#endif
         sinceReconnect = 0;
     }
 }
@@ -48,6 +56,24 @@ bool MqttSupportClass::isConnected()
 bool MqttSupportClass::publish(String message)
 {
     return mqttCient.publish(MQTT_TOPIC_PUB, message.c_str());
+}
+
+void visualizeNetworkConnectionLost()
+{
+    if (!WiFiSupport.isConnected() || !MqttSupport.isConnected())
+    {
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(300);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(300);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(100);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(100);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(300);
+    }
+    digitalWrite(LED_BUILTIN, HIGH);
 }
 
 MqttSupportClass MqttSupport = MqttSupportClass();

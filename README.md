@@ -23,8 +23,8 @@ If the built in LED of the ESP8266 module flashes, everything worked.
 
 Documentation:
 
-https://arduino-esp8266.readthedocs.io/en/latest/
-https://arduino-esp8266.readthedocs.io/en/latest/reference.html#digital-io
+* https://arduino-esp8266.readthedocs.io/en/latest/
+* https://arduino-esp8266.readthedocs.io/en/latest/reference.html#digital-io
 
 # breadboard layout
 The resistor in the image is 1k but the value is not that important, you can use values between about 500 Ohms to a few k Ohms
@@ -33,7 +33,7 @@ The built in LED will light up for 200 ms when the reed contact is closed. If yo
 ![breadboard](reed_contact_breadboard.png)
 
 # Program configuration
-The program is configured using the `build_flag`s. The table below lists all required and optional configuration possibilities:
+The program is configured using the `build_flag`. The table below lists all required and optional configuration possibilities:
 
 | Build flag | Necessity | Default value | Description |
 | - | - | - | - |
@@ -43,10 +43,11 @@ The program is configured using the `build_flag`s. The table below lists all req
 | MQTT_PORT | no  | 1883      | Set the Port to access MQTT broker. Port 1883 is the default port of [mosquitto](https://mosquitto.org) MQTT broker.|
 | MQTT_CLIENT_ID | no | esp8266 | Client ID which is visible in MQTT broker as connected client. |
 | MQTT_TOPIC_PUB | no | data/esp8266 | MQTT topic to which the measurements will be written. |
+| MQTT_USER | no | | User to connect to MQTT broker. If not set, connection will be created with an anonymous user. |
+| MQTT_PASS | no | | User password to connecto to MQTT broker. If not set, connection will be created with an anonymous user.|
 | WIFI_SSID | yes | | SSID of your WiFi network. |
 | WIFI_PASS | yes | | Password of your WiFi network. |
 | WIFI_HOSTNAME | no | | Hostname with which the client appears on your network. If not set, the WiFi client will set a default depends on your platform. |
 
-In the example you see in the commited platformio.ini file, I use the system environment variable for network configuration. 
-
+In the example you see in the `platformio.ini` file, I use the system environment variables for the network configuration. Those variables are set in my `~/.bash_profile` file like `export PLATFORMIO_WIFI_HOSTNAME=MyWiFi`. After editing of `~/.bash_profile` file, run command `source ~/.bash_profile` to inject the variables.
 
